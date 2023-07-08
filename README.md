@@ -1,0 +1,3 @@
+Governance plays a vital role in the BAO Finance ecosystem, allowing token-holders to actively participate in the decision-making process. With the introduction of Polly and the governance module, known as Governor Bravo, alongside a Timelock mechanism, BAO Finance is creating a transparent and inclusive platform for its community members to collaborate on protocol upgrades.
+
+Similar to the Compound protocol, the governance framework of BAO Finance enables proposals that can modify system parameters, introduce new markets, and even incorporate entirely new functionalities into the protocol. This ensures that the BAO Finance ecosystem remains adaptable and responsive to the evolving needs and preferences of its community.
