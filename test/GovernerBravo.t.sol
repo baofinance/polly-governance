@@ -53,7 +53,41 @@ contract CounterTest is Test {
         delegate = new GovernorBravoDelegate();
         timelock = new Timelock(address(this), 2 days);
         pollyToken = IPollyToken(0x4C392822D4bE8494B798cEA17B43d48B2308109C);
-        delegator = new GovernorBravoDelegator(address(timelock), address(pollyToken), address(this), address(delegate), proposalThreshold, votingPeriod, votingDelay);
+        delegator = new GovernorBravoDelegator(address(timelock), address(pollyToken), address(this), address(delegate),  votingPeriod, votingDelay, proposalThreshold );
+        
+        uint256 eta = block.timestamp + 3 days;
+        
+        timelock.queueTransaction(address(timelock), 0, "setPendingAdmin(address)", abi.encode(address(delegator)), eta);
+        
+        skip(4 days);
+
+        timelock.executeTransaction(address(timelock), 0, "setPendingAdmin(address)", abi.encode(address(delegator)), eta);
+        
+        (bool success2 ,) = address(delegator).call(abi.encodeWithSignature("_initiate()"));
+        assertTrue(success2);
     }
     
+    function testPropose() public {
+        // Target addresses for proposal calls
+        address[] memory targets = new address[](1);
+        targets[0] = address(this);
+        
+        // Eth values for proposal calls
+        uint256[] memory values = new uint256[](1);
+        values[0] = 0;
+
+        // Function signatures for proposal calls
+        string[] memory signatures = new string[](1);
+        signatures[0] = "test()";
+
+        // Calldata for proposal calls
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = abi.encodeWithSignature("test()");
+
+        // Description of the proposal
+        string memory description = "test proposal";
+        
+        GovernorBravoDelegate(address(delegator)).propose(targets, values, signatures, calldatas, description);
+        
+    }
 }
