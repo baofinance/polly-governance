@@ -2,9 +2,8 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../src/GovernorBravoDelegate.sol";
-import "../src/GovernorBravoDelegator.sol";
-import "../src/Timelock.sol";
+import "../src/governance/Governor.sol";
+import "../src/governance/TimelockController.sol";
 
 interface IPollyToken {
     function unlockedSupply() external view returns (uint256);
