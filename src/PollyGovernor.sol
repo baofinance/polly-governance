@@ -1,37 +1,28 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity 0.8.19;
 
-import "../lib/openzeppelin-contracts-upgradeable/contracts/governance/GovernorUpgradeable.sol";
-import "../lib/openzeppelin-contracts-upgradeable/contracts/governance/extensions/GovernorSettingsUpgradeable.sol";
-import "../lib/openzeppelin-contracts-upgradeable/contracts/governance/extensions/GovernorCountingSimpleUpgradeable.sol";
-import "../lib/openzeppelin-contracts-upgradeable/contracts/governance/extensions/GovernorVotesUpgradeable.sol";
-import "../lib/openzeppelin-contracts-upgradeable/contracts/governance/extensions/GovernorVotesQuorumFractionUpgradeable.sol";
-import "../lib/openzeppelin-contracts-upgradeable/contracts/governance/extensions/GovernorTimelockControlUpgradeable.sol";
-import "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
+import "../lib/openzeppelin-contracts/contracts/governance/Governor.sol";
+import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorSettings.sol";
+import "../lib/openzeppelin-contracts/contracts/governance/compatibility/GovernorCompatibilityBravo.sol";
+import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorVotes.sol";
+import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorTimelockControl.sol";
 
-contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUpgradeable, GovernorCountingSimpleUpgradeable, GovernorVotesUpgradeable, GovernorVotesQuorumFractionUpgradeable, GovernorTimelockControlUpgradeable {
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize(IVotesUpgradeable _token, TimelockControllerUpgradeable _timelock)
-        initializer public
-    {
-        __Governor_init("PollyGovernor");
-        __GovernorSettings_init(7200 /* 1 day */, 50400 /* 1 week */, 0);
-        __GovernorCountingSimple_init();
-        __GovernorVotes_init(_token);
-        __GovernorVotesQuorumFraction_init(4);
-        __GovernorTimelockControl_init(_timelock);
-    }
+contract PollyGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo, GovernorVotes, GovernorVotesQuorumFraction, GovernorTimelockControl {
+    constructor(IVotes _token, TimelockController _timelock)
+        Governor("PollyGovernor")
+        GovernorSettings(7200 /* 1 day */, 50400 /* 1 week */, 0)
+        GovernorVotes(_token)
+        GovernorVotesQuorumFraction(4)
+        GovernorTimelockControl(_timelock)
+    {}
 
     // The following functions are overrides required by Solidity.
 
     function votingDelay()
         public
         view
-        override(IGovernorUpgradeable, GovernorSettingsUpgradeable)
+        override(IGovernor, GovernorSettings)
         returns (uint256)
     {
         return super.votingDelay();
@@ -40,7 +31,7 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
     function votingPeriod()
         public
         view
-        override(IGovernorUpgradeable, GovernorSettingsUpgradeable)
+        override(IGovernor, GovernorSettings)
         returns (uint256)
     {
         return super.votingPeriod();
@@ -49,7 +40,7 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
     function quorum(uint256 blockNumber)
         public
         view
-        override(IGovernorUpgradeable, GovernorVotesQuorumFractionUpgradeable)
+        override(IGovernor, GovernorVotesQuorumFraction)
         returns (uint256)
     {
         return super.quorum(blockNumber);
@@ -58,7 +49,7 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
     function state(uint256 proposalId)
         public
         view
-        override(GovernorUpgradeable, GovernorTimelockControlUpgradeable)
+        override(Governor, IGovernor, GovernorTimelockControl)
         returns (ProposalState)
     {
         return super.state(proposalId);
@@ -66,7 +57,7 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
 
     function propose(address[] memory targets, uint256[] memory values, bytes[] memory calldatas, string memory description)
         public
-        override(GovernorUpgradeable, IGovernorUpgradeable)
+        override(Governor, GovernorCompatibilityBravo, IGovernor)
         returns (uint256)
     {
         return super.propose(targets, values, calldatas, description);
@@ -75,7 +66,7 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
     function proposalThreshold()
         public
         view
-        override(GovernorUpgradeable, GovernorSettingsUpgradeable)
+        override(Governor, GovernorSettings)
         returns (uint256)
     {
         return super.proposalThreshold();
@@ -83,14 +74,14 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
 
     function _execute(uint256 proposalId, address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)
         internal
-        override(GovernorUpgradeable, GovernorTimelockControlUpgradeable)
+        override(Governor, GovernorTimelockControl)
     {
         super._execute(proposalId, targets, values, calldatas, descriptionHash);
     }
 
     function _cancel(address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)
         internal
-        override(GovernorUpgradeable, GovernorTimelockControlUpgradeable)
+        override(Governor, GovernorTimelockControl)
         returns (uint256)
     {
         return super._cancel(targets, values, calldatas, descriptionHash);
@@ -99,7 +90,7 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
     function _executor()
         internal
         view
-        override(GovernorUpgradeable, GovernorTimelockControlUpgradeable)
+        override(Governor, GovernorTimelockControl)
         returns (address)
     {
         return super._executor();
@@ -108,9 +99,17 @@ contract PollyGovernor is Initializable, GovernorUpgradeable, GovernorSettingsUp
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(GovernorUpgradeable, GovernorTimelockControlUpgradeable)
+        override(Governor, IERC165, GovernorTimelockControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    function cancel(address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)
+        public
+        override(Governor, IGovernor, GovernorCompatibilityBravo)
+        returns (uint256)
+    {
+        return super.cancel(targets, values, calldatas, descriptionHash);
     }
 }
