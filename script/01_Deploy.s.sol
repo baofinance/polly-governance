@@ -3,7 +3,6 @@ pragma solidity ^0.8.13;
 
 import "../lib/forge-std/src/Script.sol";
 import "../src/PollyGovernor.sol";
-import "../src/ERC1967Proxy.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/utils/IVotes.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/TimelockController.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
@@ -13,17 +12,16 @@ contract Deploy is Script {
 
     PollyGovernor public pollyGovernor;
     TimelockController public timelockController;
-    address public pollyToken;
-    IVotes public vePolly = IVotes(0xCbAEC82448DAE09418bCd78Bf7654CB9De5a9D8d);
+    IVotes public vePolly = IVotes(0x6200e9DD633f4E979e9EC46753Af1FB30db17956);
+
+    address[] public proposers = [0x60FF4545C6e674fD182990F7A66143002Fa3A03C, 0xA849456125301De7DedA49c09a65B673C115Cf37];
+    address public admin = 0x60FF4545C6e674fD182990F7A66143002Fa3A03C;
 
     function run() public {
         vm.startBroadcast();
 
-        address[] memory proposers = new address[](1);
-        proposers[0] = address(this);
-
         // Deploy Timelock Controller
-        timelockController = new TimelockController(17280, proposers, proposers, address(this));
+        timelockController = new TimelockController(17280, proposers, proposers, admin);
         console2.log("Timelock Controller deployed at:", address(timelockController));
 
         // Deploy Governor
