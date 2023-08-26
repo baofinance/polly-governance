@@ -5,15 +5,15 @@ import "../lib/openzeppelin-contracts/contracts/governance/Governor.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorSettings.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/compatibility/GovernorCompatibilityBravo.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorVotes.sol";
-import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorTimelockControl.sol";
+import "./VoteEscrowCompatibilityGovernorVotesQuorumFraction.sol";
 
-contract PollyGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo, GovernorVotes, GovernorVotesQuorumFraction, GovernorTimelockControl {
+contract PollyGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo, GovernorVotes, VoteEscrowCompatibilityGovernorVotesQuorumFraction, GovernorTimelockControl {
     constructor(IVotes _token, TimelockController _timelock)
         Governor("PollyGovernor")
         GovernorSettings(7200 /* 1 day */, 50400 /* 1 week */, 0)
         GovernorVotes(_token)
-        GovernorVotesQuorumFraction(4)
+        VoteEscrowCompatibilityGovernorVotesQuorumFraction(4)
         GovernorTimelockControl(_timelock)
     {}
 
@@ -40,7 +40,7 @@ contract PollyGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo
     function quorum(uint256 blockNumber)
         public
         view
-        override(IGovernor, GovernorVotesQuorumFraction)
+        override(IGovernor, VoteEscrowCompatibilityGovernorVotesQuorumFraction)
         returns (uint256)
     {
         return super.quorum(blockNumber);
