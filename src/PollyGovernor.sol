@@ -4,15 +4,15 @@ pragma solidity 0.8.19;
 import "../lib/openzeppelin-contracts/contracts/governance/Governor.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorSettings.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/compatibility/GovernorCompatibilityBravo.sol";
-import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorVotes.sol";
 import "../lib/openzeppelin-contracts/contracts/governance/extensions/GovernorTimelockControl.sol";
 import "./VoteEscrowCompatibilityGovernorVotesQuorumFraction.sol";
+import "./GovernorVotesCompatibilityGovernorBravo.sol";
 
-contract PollyGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo, GovernorVotes, VoteEscrowCompatibilityGovernorVotesQuorumFraction, GovernorTimelockControl {
+contract PollyGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo, GovernorVotesCompatibilityGovernorBravo, VoteEscrowCompatibilityGovernorVotesQuorumFraction, GovernorTimelockControl {
     constructor(IVotes _token, TimelockController _timelock)
         Governor("PollyGovernor")
         GovernorSettings(7200 /* 1 day */, 50400 /* 1 week */, 0)
-        GovernorVotes(_token)
+        GovernorVotesCompatibilityGovernorBravo(_token)
         VoteEscrowCompatibilityGovernorVotesQuorumFraction(4)
         GovernorTimelockControl(_timelock)
     {}
@@ -112,4 +112,6 @@ contract PollyGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo
     {
         return super.cancel(targets, values, calldatas, descriptionHash);
     }
+
+    
 }
