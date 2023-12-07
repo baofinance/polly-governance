@@ -1,26 +1,25 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.9.0) (governance/TimelockController.sol)
 
-pragma solidity ^0.8.19;
+pragma solidity 0.8.22;
 
-import {AccessControl} from "../lib/openzeppelin-contracts/contracts/access/AccessControl.sol";
-import {ERC721Holder} from "../lib/openzeppelin-contracts/contracts/token/ERC721/utils/ERC721Holder.sol";
-import {ERC1155Holder} from "../lib/openzeppelin-contracts/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import {Address} from "../lib/openzeppelin-contracts/contracts/utils/Address.sol";
+//  $$$$$$$\   $$$$$$\   $$$$$$\        $$$$$$$$\ $$$$$$\ $$\   $$\  $$$$$$\  $$\   $$\  $$$$$$\  $$$$$$$$\ 
+//  $$  __$$\ $$  __$$\ $$  __$$\       $$  _____|\_$$  _|$$$\  $$ |$$  __$$\ $$$\  $$ |$$  __$$\ $$  _____|
+//  $$ |  $$ |$$ /  $$ |$$ /  $$ |      $$ |        $$ |  $$$$\ $$ |$$ /  $$ |$$$$\ $$ |$$ /  \__|$$ |      
+//  $$$$$$$\ |$$$$$$$$ |$$ |  $$ |      $$$$$\      $$ |  $$ $$\$$ |$$$$$$$$ |$$ $$\$$ |$$ |      $$$$$\    
+//  $$  __$$\ $$  __$$ |$$ |  $$ |      $$  __|     $$ |  $$ \$$$$ |$$  __$$ |$$ \$$$$ |$$ |      $$  __|   
+//  $$ |  $$ |$$ |  $$ |$$ |  $$ |      $$ |        $$ |  $$ |\$$$ |$$ |  $$ |$$ |\$$$ |$$ |  $$\ $$ |      
+//  $$$$$$$  |$$ |  $$ | $$$$$$  |      $$ |      $$$$$$\ $$ | \$$ |$$ |  $$ |$$ | \$$ |\$$$$$$  |$$$$$$$$\ 
+//  \_______/ \__|  \__| \______/       \__|      \______|\__|  \__|\__|  \__|\__|  \__| \______/ \________|
 
-/**
- * @dev Contract module which acts as a timelocked controller. When set as the
- * owner of an `Ownable` smart contract, it enforces a timelock on all
- * `onlyOwner` maintenance operations. This gives time for users of the
- * controlled contract to exit before a potentially dangerous maintenance
- * operation is applied.
- *
- * By default, this contract is self administered, meaning administration tasks
- * have to go through the timelock process. The proposer (resp executor) role
- * is in charge of proposing (resp executing) operations. A common use case is
- * to position this {TimelockController} as the owner of a smart contract, with
- * a multisig or a DAO as the sole proposer.
- */
+import {AccessControl} from "openzeppelin/access/AccessControl.sol";
+import {ERC721Holder} from "openzeppelin/token/ERC721/utils/ERC721Holder.sol";
+import {ERC1155Holder} from "openzeppelin/token/ERC1155/utils/ERC1155Holder.sol";
+import {Address} from "openzeppelin/utils/Address.sol";
+
+/// @author haruxe
+/// @title TimelockController
+/// @notice A timelock controller that can be used to schedule operations.
 contract TimelockController is AccessControl, ERC721Holder, ERC1155Holder {
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
     bytes32 public constant EXECUTOR_ROLE = keccak256("EXECUTOR_ROLE");
